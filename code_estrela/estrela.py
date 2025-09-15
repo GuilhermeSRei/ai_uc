@@ -13,6 +13,7 @@ import heapq
 import sqlite3
 import matplotlib.pyplot as plt
 import networkx as nx
+import os
 
 # Classe que representa um nó do grafo, guarda estado, custos e pai
 class No:
@@ -96,9 +97,19 @@ def w_sql(atual, sucessor):
 
 # Ponto de entrada do programa
 if __name__ == "__main__":
-    # Recebe do usuário o ponto inicial e final
-    inicio = input("Digite o ponto inicial: ").strip().upper()
-    fim = input("Digite o ponto final: ").strip().upper()
+    # Exibe lista somente com os nomes das cidades da heurística
+    import sqlite3
+    conn = sqlite3.connect('grafo.db')
+    c = conn.cursor()
+    c.execute('SELECT estado FROM heuristica')
+    cidades_heuristica = [row[0] for row in c.fetchall()]
+    conn.close()
+    print("Cidades presentes na heurística:")
+    for cidade in cidades_heuristica:
+        print(cidade)
+    # Recebe do usuário a cidade inicial e final
+    inicio = input("Digite o nome da cidade inicial: ").strip().title()
+    fim = input("Digite o nome da cidade final: ").strip().title()
     # Executa o algoritmo A* para encontrar o caminho
     caminho = a_estrela(inicio, fim, gerar_sucessores_sql, h_sql, w_sql)
     print("Caminho encontrado:", ' -> '.join(caminho) if caminho else "Nenhum caminho encontrado")
@@ -130,3 +141,4 @@ if __name__ == "__main__":
         nx.draw_networkx_nodes(G, pos, nodelist=caminho, node_color='orange', node_size=1300)
     plt.title(f'Caminho: {" -> ".join(caminho) if caminho else "Nenhum"}')
     plt.show()
+
